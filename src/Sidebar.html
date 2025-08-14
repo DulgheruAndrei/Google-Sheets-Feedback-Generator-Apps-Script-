@@ -1,0 +1,79 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <base target="_top">
+    <style>
+      body { font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial; padding: 12px; }
+      label { display:block; margin-top:10px; font-weight:600; }
+      input, select, textarea { width:100%; box-sizing:border-box; padding:8px; margin-top:4px; }
+      button { margin-top:14px; padding:10px 12px; width:100%; }
+      .row { display:flex; gap:8px; }
+      .row > div { flex:1; }
+      small { color:#666; }
+    </style>
+  </head>
+  <body>
+    <h2>Feedback Generator</h2>
+    <form id="f">
+      <label>Target sheet name
+        <input name="targetSheet" placeholder="Repository Sheet" />
+      </label>
+      <div class="row">
+        <div>
+          <label>User ID
+            <input name="userId" required />
+          </label>
+        </div>
+        <div>
+          <label>Status
+            <select name="status">
+              <option>Draft</option>
+              <option>Published</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <label>Brand / Casino name
+        <input name="brand" />
+      </label>
+      <div class="row">
+        <div>
+          <label>Bonus type (e.g., Free Spins)
+            <input name="bonusType" />
+          </label>
+        </div>
+        <div>
+          <label>Bonus value (e.g., 50)
+            <input name="bonusValue" />
+          </label>
+        </div>
+      </div>
+      <label>Link (optional)
+        <input name="link" placeholder="https://…" />
+      </label>
+      <label>Representative (optional)
+        <input name="rep" />
+      </label>
+      <label>Extra info (optional)
+        <textarea name="extra" rows="3" placeholder="Any extra context to append"></textarea>
+      </label>
+      <button type="submit">Generate & Append</button>
+      <small id="msg"></small>
+    </form>
+
+    <script>
+      const form = document.getElementById('f');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        document.getElementById('msg').textContent = 'Generating…';
+        const data = Object.fromEntries(new FormData(form).entries());
+        google.script.run.withSuccessHandler((res) => {
+          document.getElementById('msg').textContent = res.ok ? 'Added row #' + res.row : 'Done';
+          google.script.host.close();
+        }).withFailureHandler(err => {
+          document.getElementById('msg').textContent = 'Error: ' + err.message;
+        }).generateFeedback(data);
+      });
+    </script>
+  </body>
+</html>
